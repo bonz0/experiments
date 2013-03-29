@@ -1,9 +1,12 @@
 package trie;
 
 import java.lang.Character;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Trie {
-	private TrieNode root;
+	public TrieNode root;
 
 	public Trie() {
 		this.root = new TrieNode(" ");
@@ -78,7 +81,7 @@ public class Trie {
 		if(this.root == root) {
 			System.out.println("/");
 		} else {
-			System.out.print(root.getData());
+			System.out.println(root.getData());
 		}
 		if(root.hasChildren()) {
 			for(int iii = 0; iii < root.getChildren().size(); iii++) {
@@ -87,19 +90,38 @@ public class Trie {
 		}
 	}
 
-	public TrieNode getLastMatchingNode(String data) {
+	public TrieNode getLastDescendent(String data) {
+		if (data == null || data.length() == 0) {
+			return null;
+		}
 		data = " ".concat(data);
-		TrieNode iterator = this.root;
-		for(int iii = 0; (iii < (data.length() - 1) && iterator.hasChildren()); iii++) {
-			if(iterator.getData().equals(Character.toString(data.charAt(iii)))) {
-				int index = iterator.indexInChildren(data.charAt(iii + 1));
-				if(index >= 0) {
-					iterator = iterator.getChild(index);
-				} else {
-					return iterator;
-				}
+		TrieNode node = this.root;
+		for (int iii = 1; iii < data.length(); iii++) {
+			int index = node.indexInChildren(data.charAt(iii));
+			if (index != -1) {
+				node = node.getChild(index);
+			} else {
+				return null;
 			}
 		}
-		return null;
+		return node;
+	}
+
+	public String[] getLastMatchingNode(String data) {
+		TrieNode lastNode = this.getLastDescendent(data);
+		if(lastNode == null)
+			return new String[0];
+		ArrayList<String> results = new ArrayList<String>();
+		Queue<TrieNode> myQueue = new LinkedList<TrieNode>();
+		myQueue.add(lastNode);
+		while(!myQueue.isEmpty()) {
+			TrieNode currentNode = myQueue.poll();
+			if(currentNode.isLeaf) {
+				results.add(lastNode.getData());
+			}
+			ArrayList<TrieNode> children = currentNode.getChildren();
+			myQueue.addAll(children);
+		}
+		return results.toArray(new String[results.size()]);
 	}
 }
