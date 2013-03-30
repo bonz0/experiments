@@ -12,22 +12,22 @@ public class Trie {
 		this.root = new TrieNode(" ");
 	}
 
-	public void setRoot(TrieNode root) {
-		this.root = root;
-	}
-
-	public TrieNode getRoot() {
-		return this.root;
-	}
-
 	/*
 	 * Adds a node to the trie
+	 * @param	TrieNode	: root of trie for recursive calls
+	 * @param	data		: string to be stored
 	 */
 	public void addNode(TrieNode node, String data) {
 		addNodeAux(node, data, data);
 	}
 
-	public void addNodeAux(TrieNode node, String data, String subString) {
+	/*
+	 * Auxiliary function to add data
+	 * @param	TrieNode	: root of trie for recursive calls
+	 * @param	data		: string to be stored
+	 * @param	subString	: subString at particular recursive call
+	 */
+	private void addNodeAux(TrieNode node, String data, String subString) {
 		/*
 		 * if single character is passed as subString, then create a
 		 * node with the whole word as its child and return since 
@@ -74,14 +74,17 @@ public class Trie {
 		}
 	}
 
-	public void printTrie(TrieNode root) {
+	/*
+	 * Prints trie. For debugging purposes
+	 */
+	private void printTrie(TrieNode root) {
 		if(root == null) {
 			return;
 		}
 		if(this.root == root) {
 			System.out.println("/");
 		} else {
-			System.out.println(root.getData());
+			System.out.println(root.data);
 		}
 		if(root.hasChildren()) {
 			for(int iii = 0; iii < root.getChildren().size(); iii++) {
@@ -90,7 +93,11 @@ public class Trie {
 		}
 	}
 
-	public TrieNode getLastDescendent(String data) {
+	/*
+	 * @param 	data		: string to be searched
+	 * @return	the last node in trie that matches data
+	 */
+	private TrieNode getLastDescendent(String data) {
 		if (data == null || data.length() == 0) {
 			return null;
 		}
@@ -107,17 +114,26 @@ public class Trie {
 		return node;
 	}
 
+	/*
+	 * @param	data		: string to be searched
+	 * @return array of matches
+	 */
 	public String[] getLastMatchingNode(String data) {
+		// get last node that matches data
 		TrieNode lastNode = this.getLastDescendent(data);
 		if(lastNode == null)
 			return new String[0];
 		ArrayList<String> results = new ArrayList<String>();
+		/*
+		 * Visit all children of last node using BFS
+		 * keep track of data in leaf nodes to be returned
+		 */
 		Queue<TrieNode> myQueue = new LinkedList<TrieNode>();
 		myQueue.add(lastNode);
 		while(!myQueue.isEmpty()) {
 			TrieNode currentNode = myQueue.poll();
 			if(currentNode.isLeaf) {
-				results.add(lastNode.getData());
+				results.add(currentNode.data);
 			}
 			ArrayList<TrieNode> children = currentNode.getChildren();
 			myQueue.addAll(children);
